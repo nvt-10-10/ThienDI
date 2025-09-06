@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 36 33% 97%;
+    --foreground: 0 0% 9%;
+
+    --card: 36 33% 97%;
+    --card-foreground: 0 0% 9%;
+
+    --popover: 36 33% 97%;
+    --popover-foreground: 0 0% 9%;
+
+    --primary: 346 76% 22%;
+    --primary-foreground: 36 33% 97%;
+
+    --secondary: 36 80% 45%;
+    --secondary-foreground: 36 33% 97%;
+
+    --muted: 346 8% 80%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 36 80% 45%;
+    --accent-foreground: 36 33% 97%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 36 33% 97%;
+
+    --border: 346 8% 84%;
+    --input: 346 8% 84%;
+    --ring: 346 76% 22%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 9%;
+    --foreground: 36 33% 97%;
+
+    --card: 0 0% 9%;
+    --card-foreground: 36 33% 97%;
+
+    --popover: 0 0% 9%;
+    --popover-foreground: 36 33% 97%;
+
+    --primary: 346 76% 32%;
+    --primary-foreground: 36 33% 97%;
+
+    --secondary: 36 80% 50%;
+    --secondary-foreground: 36 33% 97%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 36 80% 50%;
+    --accent-foreground: 36 33% 97%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 36 33% 97%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 346 76% 32%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Montserrat', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant Garamond', serif;
+    @apply font-medium;
+  }
+}
+
+.banner-gradient {
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+}
+
+.elegant-shadow {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.nav-link {
+  @apply relative px-3 py-2 text-sm font-medium transition-all duration-300;
+}
+
+.nav-link:after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300;
+}
+
+.nav-link:hover:after {
+  @apply w-full;
+}
+
+.nav-link.active:after {
+  @apply w-full;
+}
