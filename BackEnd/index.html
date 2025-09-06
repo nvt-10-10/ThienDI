@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xác nhận đăng ký - GroceryMart</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      background: linear-gradient(135deg, #77DAE6, #5CBDD6);
+      padding: 40px 30px;
+      text-align: center;
+      color: white;
+    }
+
+    .logo {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .tagline {
+      font-size: 16px;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+
+    .content {
+      padding: 40px 30px;
+    }
+
+    .welcome-title {
+      font-size: 28px;
+      color: #5CBDD6;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .welcome-text {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 30px;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .otp-section {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border: 2px solid #77DAE6;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      margin: 30px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .otp-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(119, 218, 230, 0.05) 0%, transparent 70%);
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.3;
+      }
+
+      50% {
+        transform: scale(1.1);
+        opacity: 0.1;
+      }
+    }
+
+    .otp-title {
+      font-size: 18px;
+      color: #5CBDD6;
+      margin-bottom: 15px;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+
+    .otp-code {
+      font-size: 36px;
+      font-weight: bold;
+      color: #5CBDD6;
+      background: white;
+      padding: 15px 30px;
+      border-radius: 8px;
+      display: inline-block;
+      letter-spacing: 8px;
+      border: 2px dashed #77DAE6;
+      margin: 10px 0;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 4px 12px rgba(119, 218, 230, 0.2);
+    }
+
+    .otp-note {
+      font-size: 14px;
+      color: #666;
+      margin-top: 15px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .verify-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #77DAE6, #5CBDD6);
+      color: white;
+      padding: 16px 40px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      margin: 20px 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(119, 218, 230, 0.3);
+    }
+
+    .verify-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(119, 218, 230, 0.4);
+    }
+
+    .instructions {
+      background: #f8f9fa;
+      border-left: 4px solid #77DAE6;
+      padding: 20px;
+      margin: 30px 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .instructions h3 {
+      color: #5CBDD6;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .instructions ol {
+      color: #666;
+      padding-left: 20px;
+    }
+
+    .instructions li {
+      margin: 8px 0;
+    }
+
+    .footer {
+      background: #5CBDD6;
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .footer-content {
+      margin-bottom: 20px;
+    }
+
+    .footer h3 {
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+
+    .footer p {
+      opacity: 0.9;
+      line-height: 1.8;
+    }
+
+    .social-links {
+      margin: 20px 0;
+    }
+
+    .social-links a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-size: 14px;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+    }
+
+    .social-links a:hover {
+      opacity: 1;
+    }
+
+    .copyright {
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding-top: 20px;
+      font-size: 14px;
+      opacity: 0.7;
+    }
+
+    .warning {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      color: #856404;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .email-container {
+        margin: 0;
+        border-radius: 0;
+      }
+
+      .header,
+      .content,
+      .footer {
+        padding: 30px 20px;
+      }
+
+      .otp-section {
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .otp-code {
+        font-size: 28px;
+        letter-spacing: 4px;
+        padding: 12px 20px;
+      }
+
+      .verify-button {
+        display: block;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="email-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">🛒</div>
+        <span>{{siteName}}</span>
+      </div>
+      <div class="tagline">Siêu thị trực tuyến hàng đầu</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+      <h1 class="welcome-title">Chào mừng bạn đến với GroceryMart!</h1>
+
+      <p class="welcome-text">
+        Xin chào <strong>{{userName}}</strong>,<br>
+        Cảm ơn bạn đã đăng ký tài khoản tại GroceryMart. Để hoàn tất quá trình đăng ký,
+        vui lòng xác nhận địa chỉ email của bạn bằng mã OTP bên dưới.
+      </p>
+
+      <!-- OTP Section -->
+      <div class="otp-section">
+        <h2 class="otp-title">Mã xác nhận OTP của bạn:</h2>
+        <div class="otp-code">{{otpCode}}</div>
+        <p class="otp-note">
+          Mã này có hiệu lực trong <strong>{{expiryMinutes}} phút</strong> kể từ khi nhận được email này.
+        </p>
+      </div>
+
+      <!-- Verify Button -->
+      <div style="text-align: center;">
+        <a href="{{verificationUrl}}" class="verify-button">
+          Xác nhận tài khoản ngay
+        </a>
+      </div>
+
+      <!-- Instructions -->
+      <div class="instructions">
+        <h3>Hướng dẫn xác nhận:</h3>
+        <ol>
+          <li>Nhấp vào nút "Xác nhận tài khoản ngay" ở trên</li>
+          <li>Nhập mã OTP: <strong>{{otpCode}}</strong> vào ô xác nhận</li>
+          <li>Hoàn tất quá trình đăng ký và bắt đầu mua sắm</li>
+        </ol>
+      </div>
+
+      <!-- Warning -->
+      <div class="warning">
+        <strong>Lưu ý bảo mật:</strong> Không chia sẻ mã OTP này với bất kỳ ai.
+        GroceryMart sẽ không bao giờ yêu cầu bạn cung cấp mã OTP qua điện thoại hoặc email.
+      </div>
+
+      <p style="color: #666; font-size: 14px; margin-top: 30px;">
+        Nếu bạn không thể nhấp vào nút trên, hãy sao chép và dán liên kết sau vào trình duyệt:<br>
+        <span style="word-break: break-all; color: #4CAF50;">{{verificationUrl}}</span>
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="footer-content">
+        <h3>GroceryMart - Tươi ngon mỗi ngày</h3>
+        <p>
+          Khám phá hàng nghìn sản phẩm tươi ngon, chất lượng cao với giá cả hợp lý.
+          Giao hàng nhanh chóng, thanh toán an toàn.
+        </p>
+      </div>
+
+      <div class="social-links">
+        <a href="{{facebookUrl}}">Facebook</a>
+        <a href="{{instagramUrl}}">Instagram</a>
+        <a href="{{websiteUrl}}">Website</a>
+        <a href="{{supportUrl}}">Hỗ trợ</a>
+      </div>
+
+      <div class="copyright">
+        © {{currentYear}} GroceryMart. Tất cả quyền được bảo lưu.<br>
+        Địa chỉ: {{companyAddress}} | Hotline: {{supportPhone}}
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

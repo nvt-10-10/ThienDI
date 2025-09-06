@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hiển thị Markdown AI</title>
+  <!-- Import thư viện marked từ CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+  <h2>Bài học từ AI:</h2>
+  <div id="output" style="border: 1px solid #ccc; padding: 10px;"></div>
+  <video src="http://localhost:3006/videos/product/compressed-video-ec929129-2d87-4b82-84e4-33a891bf1c1c.mp4" controls></video>
+
+  <script>
+    // Ví dụ nội dung trả về từ AI (dạng Markdown)
+    const aiResponseText = `Chào mừng bạn đến với thế giới tiếng Anh! Để bắt đầu học tiếng Anh, bạn có thể xem xét những bước sau:\n\n**1. Phonics:**\n\n* Phonics là cách phát âm âm tiết trong tiếng Anh. \n* Bạn cần học cách phát âm các chữ cái đơn lẻ và các âm tiết kết hợp.\n* Ví dụ: a, b, c, d...  -->  cat, dog, hat.\n\n**2. Từ vựng cơ bản:**\n\n* Hãy học những từ vựng cơ bản như chào hỏi (hello, goodbye), giới thiệu bản thân (my name is...), con số (one, two, three...), màu sắc (red, blue, green...)\n* Bạn có thể sử dụng flashcards, ứng dụng học từ vựng hoặc sách giáo khoa để học.\n\n**3. Cấu trúc ngữ pháp đơn giản:**\n\n* Bắt đầu với các cấu trúc ngữ pháp cơ bản như \"Tôi là...\" (I am...), \"Bạn là ai?\" (Who are you?), \"Tôi thích...\" (I like...)\n* Các sách giáo khoa tiếng Anh dành cho người mới bắt đầu thường có phần hướng dẫn ngữ pháp rõ ràng.\n\n**4. Nghe và nói:**\n\n* Nghe nhạc tiếng Anh, xem phim tiếng Anh với phụ đề, trò chuyện với người bản ngữ.\n* Luyện nói tiếng Anh ngay từ đầu, không cần phải hoàn hảo, điều quan trọng là bạn phải tập trung vào việc giao tiếp.\n\n**5. Đọc và viết:**\n\n* Bắt đầu với những câu chuyện tranh, sách thiếu nhi.\n* Viết đơn giản về những điều bạn đã học, ví dụ: \"Tôi là [tên]. Tôi thích [món ăn].\"\n\n**Lý tưởng nhất là bạn nên kết hợp tất cả các kỹ năng này trong quá trình học.** \n\n**Một số nguồn học tiếng Anh hữu ích:**\n\n* Ứng dụng Duolingo, Memrise\n* Sách giáo khoa tiếng Anh dành cho người mới bắt đầu (ví dụ: \"English for Everyone\", \"Headway\")\n* Website tiếng Anh: BBC Learning English, VOA Learning English\n\nHãy kiên trì và đừng sợ mắc lỗi, điều quan trọng là bạn phải tiếp tục học tập và luyện tập. Chúc bạn học tiếng Anh thành công!"
+`;
+
+    // Chuyển đổi Markdown sang HTML
+    const html = marked.parse(aiResponseText);
+
+    // Gán HTML vào thẻ div
+    document.getElementById('output').innerHTML = html;
+  </script>
+</body>
+
+</html>

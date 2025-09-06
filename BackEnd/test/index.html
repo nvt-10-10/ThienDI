@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Chat App</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1200px;
+      height: 90vh;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Login Page Styles */
+    #login-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 3rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      min-width: 400px;
+    }
+
+    .login-container h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2rem;
+      font-weight: 300;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+      background: white;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+    }
+
+    #login-error {
+      color: #ff4757;
+      text-align: center;
+      margin-top: 1rem;
+      padding: 0.5rem;
+      background: rgba(255, 71, 87, 0.1);
+      border-radius: 8px;
+      display: none;
+    }
+
+    /* Chat Page Styles */
+    #chat-page {
+      display: none;
+      height: 100%;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-header h2 {
+      font-weight: 300;
+      font-size: 1.5rem;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+
+    .chat-content {
+      flex: 1;
+      display: flex;
+      height: calc(100% - 100px);
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: 350px;
+      background: #f8f9fa;
+      border-right: 1px solid #e9ecef;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .search-container {
+      padding: 1.5rem;
+      background: white;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 2px solid #e9ecef;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+    }
+
+    .clear-search {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .clear-search:hover {
+      background: #c82333;
+    }
+
+    .users-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+
+    .users-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      margin-bottom: 1rem;
+      background: #667eea;
+      color: white;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .user-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: white;
+      border: 1px solid #e9ecef;
+    }
+
+    .user-item:hover {
+      background: #667eea;
+      color: white;
+      transform: translateX(5px);
+    }
+
+    .user-item.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .user-item-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      margin-right: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .user-item-info {
+      flex: 1;
+    }
+
+    .user-item-name {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .user-item-id {
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+
+    .last-message {
+      font-size: 0.8rem;
+      opacity: 0.6;
+      margin-top: 0.25rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #6c757d;
+    }
+
+    .no-more-messages {
+      text-align: center;
+      padding: 1rem;
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+
+    .search-loading {
+      text-align: center;
+      padding: 1rem;
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+
+    /* Chat Area Styles */
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+      background: #f8f9fa;
+    }
+
+    .message {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .message.you {
+      justify-content: flex-end;
+    }
+
+    .message-bubble {
+      max-width: 70%;
+      padding: 0.75rem 1rem;
+      border-radius: 18px;
+      position: relative;
+      word-wrap: break-word;
+    }
+
+    .message.you .message-bubble {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-bottom-right-radius: 5px;
+    }
+
+    .message.other .message-bubble {
+      background: white;
+      color: #333;
+      border: 1px solid #e9ecef;
+      border-bottom-left-radius: 5px;
+    }
+
+    .message-info {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+
+    /* Message Input Styles */
+    .message-input-container {
+      padding: 1.5rem;
+      background: white;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .message-input-form {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .selected-user {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .message-input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e9ecef;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .message-input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .send-btn {
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      border: none;
+      border-radius: 25px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .send-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Scrollbar Styles */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .app-container {
+        height: 100vh;
+        border-radius: 0;
+      }
+
+      .sidebar {
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .chat-content {
+        flex-direction: column;
+      }
+
+      .login-container {
+        min-width: 90%;
+        padding: 2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Login Page -->
+    <div id="login-page">
+      <div class="login-container">
+        <h2>Welcome Back</h2>
+        <form id="login-form">
+          <div class="form-group">
+            <input type="text" id="email" placeholder="Email" required>
+          </div>
+          <div class="form-group">
+            <input type="password" id="password" placeholder="Password" required>
+          </div>
+          <button type="submit" class="login-btn">Sign In</button>
+        </form>
+        <div id="login-error">Login failed. Please check your credentials.</div>
+      </div>
+    </div>
+
+    <!-- Chat Page -->
+    <div id="chat-page">
+      <div class="chat-header">
+        <h2>Chat Room</h2>
+        <div class="user-info">
+          <div class="user-avatar" id="user-avatar"></div>
+          <div>
+            <div><strong>ID:</strong> <span id="user-id-display"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-content">
+        <div class="sidebar">
+          <div class="search-container">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" class="search-input" id="user-search" placeholder="Search users...">
+              <button class="clear-search" id="clear-search">×</button>
+            </div>
+          </div>
+          <div class="users-list" id="users-list">
+            <div class="loading">Loading conversations...</div>
+          </div>
+        </div>
+
+        <div class="chat-area">
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="message-input-container">
+            <form class="message-input-form" id="message-form">
+              <div class="selected-user" id="selected-user" style="display: none;">
+                To: <span id="selected-username"></span>
+              </div>
+              <input type="text" class="message-input" id="message-input" placeholder="Type a message..." autocomplete="off" required>
+              <button type="submit" class="send-btn" id="send-btn" disabled>Send</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const loginPage = document.getElementById('login-page');
+    const chatPage = document.getElementById('chat-page');
+    const loginForm = document.getElementById('login-form');
+    const messageForm = document.getElementById('message-form');
+    const chatMessages = document.getElementById('chat-messages');
+    const loginError = document.getElementById('login-error');
+    const messageInput = document.getElementById('message-input');
+    const userIdDisplay = document.getElementById('user-id-display');
+    const userAvatar = document.getElementById('user-avatar');
+    const usersList = document.getElementById('users-list');
+    const userSearch = document.getElementById('user-search');
+    const clearSearchBtn = document.getElementById('clear-search');
+    const selectedUser = document.getElementById('selected-user');
+    const selectedUsername = document.getElementById('selected-username');
+    const sendBtn = document.getElementById('send-btn');
+
+    let socket;
+    let token = null;
+    let userId = null;
+    let currentChatUser = null;
+    let allUsers = [];
+    let searchResults = [];
+    let isSearchMode = false;
+    let searchTimeout = null;
+    let knownUsers = new Map();
+    let domain = 'http://localhost:3006';
+    let currentPage = 1;
+    let pageSize = 10;
+    let isLoadingMessages = false;
+    let hasMoreMessages = true;
+
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initially hide chat page
+      chatPage.style.display = 'none';
+
+      // Set up event listeners
+      setupEventListeners();
+    });
+
+    function setupEventListeners() {
+      // Login form
+      loginForm.addEventListener('submit', handleLogin);
+
+      // Message form
+      messageForm.addEventListener('submit', handleSendMessage);
+
+      // Search functionality
+      userSearch.addEventListener('input', handleSearch);
+
+      // Clear search button
+      clearSearchBtn.addEventListener('click', handleClearSearch);
+
+      // Scroll event for loading more messages
+      chatMessages.addEventListener('scroll', handleScroll);
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      loginError.style.display = 'none';
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch(`${domain}/api/user/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            password
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to login');
+
+        const data = await response.json();
+        token = data.data.access_token;
+        userId = data.data.user.id;
+
+        // Update UI
+        userIdDisplay.textContent = userId;
+        userAvatar.textContent = userId.toString().charAt(0).toUpperCase();
+
+        // Load initial data
+        await loadChattedUsers();
+
+        // Connect socket
+        connectSocket(token);
+
+        // Switch to chat page
+        loginPage.style.display = 'none';
+        chatPage.style.display = 'block';
+
+      } catch (error) {
+        console.error('Login error:', error);
+        loginError.style.display = 'block';
+      }
+    }
+
+    async function loadChattedUsers() {
+      try {
+        usersList.innerHTML = '<div class="loading">Loading conversations...</div>';
+
+        const response = await fetch(`${domain}/api/user/conversation/chatted`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch chatted users');
+        }
+
+        const data = await response.json();
+
+        // Transform API data
+        allUsers = data.data.items.map(item => {
+          const otherParticipant = item.participants.find(p => p.user.id !== userId);
+
+          if (otherParticipant) {
+            return {
+              id: otherParticipant.user.id,
+              conversationId: item.id,
+              username: otherParticipant.user.username || otherParticipant.user.name || `User ${otherParticipant.user.id}`,
+              name: otherParticipant.user.name || '',
+              avatar: otherParticipant.user.avatar,
+              lastMessage: item.last_message_preview,
+              lastMessageAt: item.last_message_at,
+              isFromSearch: false
+            };
+          }
+          return null;
+        }).filter(user => user !== null);
+
+        renderUsersList(allUsers, 'Recent Conversations');
+
+      } catch (error) {
+        console.error('Error loading chatted users:', error);
+        usersList.innerHTML = '<div class="loading">Failed to load conversations. Please try again.</div>';
+      }
+    }
+
+    async function searchUsers(query) {
+      if (!query.trim()) {
+        clearSearch();
+        return;
+      }
+
+      try {
+        usersList.innerHTML = '<div class="loading">Searching users...</div>';
+
+        const response = await fetch(`${domain}/api/user/conversation/search-user?search=${encodeURIComponent(query)}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to search users');
+        }
+
+        const data = await response.json();
+
+        searchResults = data.data.items.map(user => ({
+          id: user.id,
+          conversationId: null,
+          username: user.username || user.name || `User ${user.id}`,
+          name: user.name || '',
+          avatar: user.avatar,
+          lastMessage: null,
+          lastMessageAt: null,
+          isFromSearch: true
+        }));
+
+        isSearchMode = true;
+        renderUsersList(searchResults, `Search Results (${searchResults.length})`);
+        clearSearchBtn.style.display = 'block';
+
+      } catch (error) {
+        console.error('Error searching users:', error);
+        usersList.innerHTML = '<div class="loading">Failed to search users. Please try again.</div>';
+      }
+    }
+
+    function clearSearch() {
+      userSearch.value = '';
+      clearSearchBtn.style.display = 'none';
+      isSearchMode = false;
+      searchResults = [];
+      loadChattedUsers();
+    }
+
+    function renderUsersList(users, headerText) {
+      usersList.innerHTML = '';
+
+      // Add header
+      if (headerText) {
+        const headerEl = document.createElement('div');
+        headerEl.className = 'users-list-header';
+        headerEl.innerHTML = `<span>${headerText}</span>`;
+        usersList.appendChild(headerEl);
+      }
+
+      if (users.length === 0) {
+        const noUsersEl = document.createElement('div');
+        noUsersEl.className = 'loading';
+        noUsersEl.textContent = isSearchMode ? 'No users found.' : 'No conversations found.';
+        usersList.appendChild(noUsersEl);
+        return;
+      }
+
+      users.forEach(user => {
+        const userEl = document.createElement('div');
+        userEl.className = 'user-item';
+        userEl.setAttribute('data-user-id', user.id);
+
+        const avatarText = user.avatar ? '' : user.username.charAt(0).toUpperCase();
+        const lastMessageDisplay = user.lastMessage ?
+          `<div class="last-message">${user.lastMessage}</div>` : '';
+
+        userEl.innerHTML = `
+      <div class="user-item-avatar">${avatarText}</div>
+      <div class="user-item-info">
+        <div class="user-item-name">${user.username}</div>
+        <div class="user-item-id">ID: ${user.id}</div>
+        ${lastMessageDisplay}
+      </div>
+    `;
+
+        userEl.addEventListener('click', () => selectUser(user, userEl));
+        usersList.appendChild(userEl);
+      });
+    }
+
+    function selectUser(user, userElement) {
+      currentChatUser = user;
+
+      // Update UI
+      selectedUser.style.display = 'block';
+      selectedUsername.textContent = user.username;
+      sendBtn.disabled = false;
+
+      // Update active state
+      document.querySelectorAll('.user-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      userElement.classList.add('active');
+
+      // Reset pagination
+      currentPage = 1;
+      hasMoreMessages = true;
+
+      // Load messages
+      if (user.conversationId) {
+        loadConversationMessages(user.conversationId);
+      } else if (user.isFromSearch) {
+        loadConversationWithUser(user.id);
+      } else {
+        chatMessages.innerHTML = '<div class="loading">Start a conversation by sending a message.</div>';
+      }
+    }
+
+    async function loadConversationMessages(conversationId, page = 1, append = false) {
+      if (isLoadingMessages || (!hasMoreMessages && append)) return;
+
+      isLoadingMessages = true;
+      const scrollHeightBefore = chatMessages.scrollHeight;
+      const scrollTopBefore = chatMessages.scrollTop;
+
+      try {
+        if (!append) {
+          chatMessages.innerHTML = '<div class="loading">Loading messages...</div>';
+        }
+
+        const response = await fetch(`${domain}/api/user/conversation/${conversationId}/messages?page=${page}&size=${pageSize}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch messages');
+        }
+
+        const data = await response.json();
+        const messages = data.data.items || [];
+        console.log({
+          messages,
+          data
+        });
+
+
+        hasMoreMessages = messages.length === pageSize;
+
+        if (!append) {
+          chatMessages.innerHTML = '';
+        }
+
+        messages.forEach(message => {
+          const messageElement = createMessageElement(message);
+          if (append) {
+            chatMessages.insertBefore(messageElement, chatMessages.firstChild);
+          } else {
+            chatMessages.appendChild(messageElement);
+          }
+        });
+
+        // Handle scroll position
+        if (append && messages.length > 0) {
+          const newScrollHeight = chatMessages.scrollHeight;
+          chatMessages.scrollTop = scrollTopBefore + (newScrollHeight - scrollHeightBefore);
+        } else if (!append) {
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        currentPage = page;
+
+      } catch (error) {
+        console.error('Error loading messages:', error);
+        if (!append) {
+          chatMessages.innerHTML = '<div class="loading">Failed to load messages. Please try again.</div>';
+        }
+      } finally {
+        isLoadingMessages = false;
+      }
+    }
+
+    async function loadConversationWithUser(targetUserId) {
+      try {
+        currentPage = 1;
+        hasMoreMessages = true;
+        chatMessages.innerHTML = '<div class="loading">Loading messages...</div>';
+
+        const response = await fetch(`${domain}/api/user/conversation/withId?targetId=${targetUserId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch conversation');
+        }
+
+        const data = await response.json();
+        const messages = data.data.items || [];
+
+        chatMessages.innerHTML = '';
+
+        messages.forEach(message => {
+          const messageElement = createMessageElement(message, true);
+          chatMessages.appendChild(messageElement);
+        });
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      } catch (error) {
+        console.error('Error loading conversation:', error);
+        chatMessages.innerHTML = '<div class="loading">Failed to load conversation. Please try again.</div>';
+      }
+    }
+
+    function createMessageElement(message, useBody = false) {
+      const isCurrentUser = message.sender_id === userId;
+      const content = useBody ? message.body : message.content;
+      const timeStamp = new Date(message.created_at).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      const messageElement = document.createElement('div');
+      messageElement.className = `message ${isCurrentUser ? 'you' : 'other'}`;
+
+      messageElement.innerHTML = `
+    <div class="message-bubble">
+      <div class="message-content">${content}</div>
+      <div class="message-info">${isCurrentUser ? 'You' : currentChatUser.username} • ${timeStamp}</div>
+    </div>
+  `;
+
+      return messageElement;
+    }
+
+    function handleSendMessage(e) {
+      e.preventDefault();
+      if (!currentChatUser || !socket) return;
+
+      const text = messageInput.value.trim();
+      if (!text) return;
+
+      socket.emit('send-message', {
+        to_user_id: currentChatUser.id,
+        text
+      });
+
+      // Add message to UI immediately
+      addMessageToChat(text, true, 'You');
+      messageInput.value = '';
+    }
+
+    function addMessageToChat(text, isCurrentUser, userName) {
+      const messageElement = document.createElement('div');
+      messageElement.className = `message ${isCurrentUser ? 'you' : 'other'}`;
+
+      const time = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      messageElement.innerHTML = `
+    <div class="message-bubble">
+      <div class="message-content">${text}</div>
+      <div class="message-info">${userName} • ${time}</div>
+    </div>
+  `;
+
+      chatMessages.appendChild(messageElement);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function handleSearch() {
+      const query = userSearch.value.trim();
+
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+
+      searchTimeout = setTimeout(() => {
+        if (query) {
+          searchUsers(query);
+        } else {
+          clearSearch();
+        }
+      }, 300);
+    }
+
+    function handleClearSearch() {
+      clearSearch();
+    }
+
+    function handleScroll() {
+      if (isLoadingMessages || !hasMoreMessages || !currentChatUser || !currentChatUser.conversationId) return;
+
+      if (chatMessages.scrollTop < 100) {
+        loadConversationMessages(currentChatUser.conversationId, currentPage + 1, true);
+      }
+    }
+
+    function connectSocket(authToken) {
+      socket = io("http://localhost:3002", {
+        extraHeaders: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+
+      socket.on('connect', () => {
+        console.log('Socket connected:', socket.id);
+      });
+
+      socket.on('personal-message', (msg) => {
+        const senderUser = allUsers.find(u => u.id === msg.from_user_id);
+        const senderName = senderUser?.username || `User ${msg.from_user_id}`;
+
+        // Only add message if it's from the current chat user
+        if (currentChatUser && currentChatUser.id === msg.from_user_id) {
+          addMessageToChat(msg.text, false, senderName);
+        }
+
+        addUserToKnown(msg.from_user_id, senderName);
+      });
+
+      socket.on('message-receive', (msg) => {
+        // This is confirmation that our message was sent
+        console.log('Message sent confirmation:', msg);
+      });
+
+      socket.on('connect_error', (err) => {
+        console.error('Socket connection failed:', err.message);
+        alert('Socket connection failed: ' + err.message);
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Socket disconnected');
+      });
+    }
+
+    function addUserToKnown(userIdTarget, userName) {
+      if (userIdTarget === userId || knownUsers.has(userIdTarget)) return;
+
+      knownUsers.set(userIdTarget, {
+        username: userName,
+        id: userIdTarget
+      });
+
+      // Add to users list if not already there
+      if (!allUsers.find(u => u.id === userIdTarget)) {
+        const newUser = {
+          id: userIdTarget,
+          conversationId: null,
+          username: userName,
+          name: userName,
+          avatar: null,
+          lastMessage: null,
+          lastMessageAt: null,
+          isFromSearch: false
+        };
+        allUsers.push(newUser);
+
+        // Re-render if not in search mode
+        if (!isSearchMode) {
+          renderUsersList(allUsers, 'Recent Conversations');
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>
